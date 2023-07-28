@@ -1,0 +1,6 @@
+[homelab]
+homelab
+
+[homelab:vars]
+ansible_host=192.168.18.96
+ansible_user=sleao

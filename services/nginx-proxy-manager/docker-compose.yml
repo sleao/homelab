@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  nginx-proxy-manager:
+    image: "jc21/nginx-proxy-manager:latest"
+    container_name: npm
+    restart: always
+    security_opt:
+      - label:disable
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8081:81"
+    volumes:
+      - ${CONFIG_FOLDER}/data:/data
+      - ${CONFIG_FOLDER}/letsencrypt:/etc/letsencrypt
+    networks:
+      - reverseproxy-nw
+
+networks:
+  reverseproxy-nw:
+    external: true

@@ -1,0 +1,31 @@
+username: "sleao"
+puid: "1000"
+pgid: "1000"
+ip_address: "192.168.18.96"
+timezone: "America/Sao_Paulo"
+
+packages:
+  - unzip
+  - wget
+  - curl
+  - git
+  - speedtest-cli
+  - htop
+  - exa
+  - git
+  - neofetch
+  - neovim
+  - tmux
+  - expect
+
+docker_dependencies:
+  - ca-certificates
+  - gnupg
+  - curl
+
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
