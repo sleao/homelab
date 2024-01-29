@@ -78,6 +78,7 @@ services:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
     network_mode: host
+    restart: always
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -89,7 +90,9 @@ services:
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
-    network_mode: host
+    networks:
+      - arr-internal
+      - reverseproxy-nw
     environment:
       - PUID=${PUID}
       - PGID=${PGID}

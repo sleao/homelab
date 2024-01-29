@@ -1,0 +1,44 @@
+version: "3.1"
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    networks:
+      - lab-internal
+      - reverseproxy-nw
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
+
+  postgres:
+    image: postgres
+    container_name: posty
+    restart: always
+    shm_size: 1g
+    ports:
+      - 5432:5432
+    networks:
+      - lab-internal
+      - reverseproxy-nw
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASS}
+
+  bytebase:
+    image: bytebase/bytebase:2.13.1
+    container_name: bytebase
+    restart: always
+    networks:
+      - lab-internal
+      - reverseproxy-nw
+    volumes:
+      - ${CONFIG_FOLDER}/bytebase:/var/opt/bytebase
+
+
+networks:
+  lab-internal:
+  reverseproxy-nw:
+    external: true
