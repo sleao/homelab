@@ -14,10 +14,15 @@ services:
 
   watchtower:
     image: containrrr/watchtower
+    container_name: watchtower
+    environment:
+      DOCKER_CONFIG: /config
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /root/.docker/config.json:/config.json
+      - /etc/watchtower/config/:/config/
     command: --interval 30
+    networks:
+      - reverseproxy-nw
 
 networks:
   reverseproxy-nw:
