@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 services:
   homeassistant:
     container_name: homeassistant
@@ -11,6 +11,8 @@ services:
     networks:
       - reverseproxy-nw
 
+
 networks:
   reverseproxy-nw:
     external: true
+      
