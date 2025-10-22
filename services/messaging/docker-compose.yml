@@ -16,7 +16,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.sleao.dev`)"
-      - "traefik.http.routers.rabbitmq.entrypoints=websecure"
+      - "traefik.http.routers.rabbitmq.entrypoints=web,websecure"
       - "traefik.http.routers.rabbitmq.tls.certresolver=letsencrypt"
       - "traefik.http.routers.rabbitmq.middlewares=authelia@file"
       - "traefik.http.services.rabbitmq.loadbalancer.server.port=15672"

@@ -15,9 +15,14 @@ services:
       - messaging_messaging-internal
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.authelia.rule=Host(`auth.sleao.dev`)"
-      - "traefik.http.routers.authelia.entrypoints=websecure"
-      - "traefik.http.routers.authelia.tls.certresolver=letsencrypt"
+      # HTTP router
+      - "traefik.http.routers.authelia-http.rule=Host(`auth.sleao.dev`)"
+      - "traefik.http.routers.authelia-http.entrypoints=web"
+      # HTTPS router
+      - "traefik.http.routers.authelia-https.rule=Host(`auth.sleao.dev`)"
+      - "traefik.http.routers.authelia-https.entrypoints=websecure"
+      - "traefik.http.routers.authelia-https.tls.certresolver=letsencrypt"
+      # Service
       - "traefik.http.services.authelia.loadbalancer.server.port=9091"
 
 networks:
