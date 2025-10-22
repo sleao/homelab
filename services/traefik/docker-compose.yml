@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v3.2
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CONFIG_FOLDER}/traefik.yml:/traefik.yml:ro
+      - ${CONFIG_FOLDER}/dynamic:/dynamic:ro
+      - ${CONFIG_FOLDER}/acme.json:/acme.json
+      - ${CONFIG_FOLDER}/logs:/logs
+    networks:
+      - reverseproxy-nw
+    labels:
+      - "traefik.enable=true"
+      # Dashboard
+      - "traefik.http.routers.traefik.rule=Host(`traefik.sleao.dev`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.middlewares=authelia@file"
+
+networks:
+  reverseproxy-nw:
+    external: true

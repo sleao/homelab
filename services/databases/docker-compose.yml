@@ -1,0 +1,72 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    networks:
+      - database-internal
+      - reverseproxy-nw
+    volumes:
+      - ${CONFIG_FOLDER}/mongo:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: unless-stopped
+    shm_size: 1g
+    ports:
+      - 5432:5432
+    networks:
+      - database-internal
+      - reverseproxy-nw
+    volumes:
+      - ${CONFIG_FOLDER}/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASS}
+
+  pg_admin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    networks:
+      - database-internal
+      - reverseproxy-nw
+    volumes:
+      - ${CONFIG_FOLDER}/pgadmin:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.sleao.dev`)"
+      - "traefik.http.routers.pgadmin.entrypoints=websecure"
+      - "traefik.http.routers.pgadmin.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.pgadmin.middlewares=authelia@file"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+
+  chartdb:
+    image: ghcr.io/chartdb/chartdb:latest
+    container_name: chartdb
+    restart: unless-stopped
+    networks:
+      - database-internal
+      - reverseproxy-nw
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chartdb.rule=Host(`chartdb.sleao.dev`)"
+      - "traefik.http.routers.chartdb.entrypoints=websecure"
+      - "traefik.http.routers.chartdb.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.chartdb.middlewares=authelia@file"
+      - "traefik.http.services.chartdb.loadbalancer.server.port=80"
+
+networks:
+  database-internal:
+  reverseproxy-nw:
+    external: true

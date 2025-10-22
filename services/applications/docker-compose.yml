@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  labelstudio:
+    image: heartexlabs/label-studio:latest
+    container_name: labelstudio
+    restart: unless-stopped
+    environment:
+      - DJANGO_DB=default
+      - POSTGRE_NAME=labelstudio
+      - POSTGRE_USER=postgres
+      - POSTGRE_PASSWORD=${DB_PASS}
+      - POSTGRE_PORT=5432
+      - POSTGRE_HOST=postgres
+      - LABEL_STUDIO_HOST=https://ls.sleao.dev/
+      - CSRF_TRUSTED_ORIGINS=https://ls.sleao.dev
+      - JSON_LOG=1
+      - LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
+      - LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/media
+    volumes:
+      - ${CONFIG_FOLDER}/labelstudio:/label-studio/data
+      - ${CONFIG_FOLDER}/labelstudio/media:/label-studio/media
+    command: label-studio-uwsgi
+    networks:
+      - applications-internal
+      - reverseproxy-nw
+      - databases_database-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.labelstudio.rule=Host(`ls.sleao.dev`)"
+      - "traefik.http.routers.labelstudio.entrypoints=websecure"
+      - "traefik.http.routers.labelstudio.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.labelstudio.middlewares=authelia@file"
+      - "traefik.http.services.labelstudio.loadbalancer.server.port=80"
+
+  wallabag:
+    image: wallabag/wallabag
+    container_name: wallabag
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - SYMFONY__ENV__DATABASE_DRIVER=pdo_pgsql
+      - SYMFONY__ENV__DATABASE_HOST=postgres
+      - SYMFONY__ENV__DATABASE_PORT=5432
+      - SYMFONY__ENV__DATABASE_NAME=wallabag
+      - SYMFONY__ENV__DATABASE_USER=postgres
+      - SYMFONY__ENV__DATABASE_PASSWORD=${DB_PASS}
+      - SYMFONY__ENV__DATABASE_CHARSET=utf8
+      - SYMFONY__ENV__DATABASE_TABLE_PREFIX=""
+      - SYMFONY__ENV__MAILER_DSN=smtp://127.0.0.1
+      - SYMFONY__ENV__FROM_EMAIL=wallabag@example.com
+      - SYMFONY__ENV__DOMAIN_NAME=https://wall.sleao.dev
+    networks:
+      - applications-internal
+      - reverseproxy-nw
+      - databases_database-internal
+    volumes:
+      - ${CONFIG_FOLDER}/wallabag/images:/var/www/wallabag/web/assets/images
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wallabag.rule=Host(`wall.sleao.dev`)"
+      - "traefik.http.routers.wallabag.entrypoints=websecure"
+      - "traefik.http.routers.wallabag.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.wallabag.middlewares=authelia@file"
+      - "traefik.http.services.wallabag.loadbalancer.server.port=80"
+
+networks:
+  applications-internal:
+  reverseproxy-nw:
+    external: true
+  databases_database-internal:
+    external: true

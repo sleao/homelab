@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  rabbit:
+    image: rabbitmq:3-management
+    container_name: rabbit
+    restart: unless-stopped
+    ports:
+      - 5672:5672
+    networks:
+      - messaging-internal
+      - reverseproxy-nw
+    environment:
+      RABBITMQ_DEFAULT_USER: ${DB_USER}
+      RABBITMQ_DEFAULT_PASS: ${DB_PASS}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.sleao.dev`)"
+      - "traefik.http.routers.rabbitmq.entrypoints=websecure"
+      - "traefik.http.routers.rabbitmq.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.rabbitmq.middlewares=authelia@file"
+      - "traefik.http.services.rabbitmq.loadbalancer.server.port=15672"
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    environment:
+      - REDIS_PASSWORD=${DB_PASS}
+      - REDIS_TLS_ENABLED=false
+      - REDIS_MAXMEMORY=256mb
+      - REDIS_MAXMEMORY_POLICY=allkeys-lru
+      - REDIS_APPENDONLY=yes
+      - REDIS_APPENDFSYNC=everysec
+    networks:
+      - messaging-internal
+      - reverseproxy-nw
+
+networks:
+  messaging-internal:
+  reverseproxy-nw:
+    external: true
