@@ -28,7 +28,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.labelstudio.rule=Host(`ls.sleao.dev`)"
-      - "traefik.http.routers.labelstudio.entrypoints=web,websecure"
+      - "traefik.http.routers.labelstudio.entrypoints=websecure"
       - "traefik.http.routers.labelstudio.tls.certresolver=letsencrypt"
       - "traefik.http.routers.labelstudio.middlewares=authelia@file"
       - "traefik.http.services.labelstudio.loadbalancer.server.port=80"
@@ -60,7 +60,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.wallabag.rule=Host(`wall.sleao.dev`)"
-      - "traefik.http.routers.wallabag.entrypoints=web,websecure"
+      - "traefik.http.routers.wallabag.entrypoints=websecure"
       - "traefik.http.routers.wallabag.tls.certresolver=letsencrypt"
       - "traefik.http.routers.wallabag.middlewares=authelia@file"
       - "traefik.http.services.wallabag.loadbalancer.server.port=80"

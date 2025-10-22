@@ -15,10 +15,15 @@ services:
       RABBITMQ_DEFAULT_PASS: ${DB_PASS}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.sleao.dev`)"
-      - "traefik.http.routers.rabbitmq.entrypoints=web,websecure"
-      - "traefik.http.routers.rabbitmq.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.rabbitmq.middlewares=authelia@file"
+      # HTTP router
+      - "traefik.http.routers.rabbitmq-http.rule=Host(`rabbitmq.sleao.dev`)"
+      - "traefik.http.routers.rabbitmq-http.entrypoints=web"
+      # HTTPS router
+      - "traefik.http.routers.rabbitmq-https.rule=Host(`rabbitmq.sleao.dev`)"
+      - "traefik.http.routers.rabbitmq-https.entrypoints=websecure"
+      - "traefik.http.routers.rabbitmq-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.rabbitmq-https.middlewares=authelia@file"
+      # Service
       - "traefik.http.services.rabbitmq.loadbalancer.server.port=15672"
 
   redis:
