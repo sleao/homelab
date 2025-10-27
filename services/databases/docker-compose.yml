@@ -76,7 +76,20 @@ services:
       # Service
       - "traefik.http.services.chartdb.loadbalancer.server.port=80"
 
+  postgres_exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres_exporter
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - DATA_SOURCE_NAME=postgresql://postgres:${DB_PASS}@postgres:5432/postgres?sslmode=disable
+    networks:
+      - database-internal
+      - monitoring_monitoring-internal
+
 networks:
   database-internal:
   reverseproxy-nw:
+    external: true
+  monitoring_monitoring-internal:
     external: true

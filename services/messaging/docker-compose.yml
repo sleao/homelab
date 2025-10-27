@@ -43,7 +43,21 @@ services:
       - messaging-internal
       - reverseproxy-nw
 
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis_exporter
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - REDIS_ADDR=redis:6379
+      - REDIS_PASSWORD=${DB_PASS}
+    networks:
+      - messaging-internal
+      - monitoring_monitoring-internal
+
 networks:
   messaging-internal:
   reverseproxy-nw:
+    external: true
+  monitoring_monitoring-internal:
     external: true
