@@ -20,6 +20,7 @@ services:
     volumes:
       - ${CONFIG_FOLDER}/labelstudio:/label-studio/data
       - ${CONFIG_FOLDER}/labelstudio/media:/label-studio/media
+    user: root
     command: label-studio-uwsgi
     networks:
       - applications-internal
@@ -31,7 +32,7 @@ services:
       - "traefik.http.routers.labelstudio.entrypoints=websecure"
       - "traefik.http.routers.labelstudio.tls.certresolver=letsencrypt"
       - "traefik.http.routers.labelstudio.middlewares=authelia@file"
-      - "traefik.http.services.labelstudio.loadbalancer.server.port=80"
+      - "traefik.http.services.labelstudio.loadbalancer.server.port=8080"
 
   wallabag:
     image: wallabag/wallabag
