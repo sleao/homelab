@@ -108,7 +108,7 @@ services:
       - "traefik.http.routers.bazarr.tls.certresolver=letsencrypt"
       - "traefik.http.routers.bazarr.middlewares=authelia@file"
       - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
-    
+
   plex:
     image: linuxserver/plex
     container_name: plex
@@ -129,6 +129,7 @@ services:
     container_name: jellyfin
     environment:
       - TZ=${TZ}
+      - NVIDIA_VISIBLE_DEVICES=all
     volumes:
       - ${CONFIG_FOLDER}/jellyfin:/config
       - ${CONFIG_FOLDER}/jellyfin/cache:/cache
@@ -137,6 +138,7 @@ services:
       - arr-internal
       - reverseproxy-nw
     restart: unless-stopped
+    runtime: nvidia
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.sleao.dev`)"
@@ -144,6 +146,13 @@ services:
       - "traefik.http.routers.jellyfin.tls.certresolver=letsencrypt"
       - "traefik.http.routers.jellyfin.middlewares=authelia@file"
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
