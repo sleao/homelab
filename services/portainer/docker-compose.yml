@@ -17,18 +17,6 @@ services:
       - "traefik.http.routers.portainer.middlewares=authelia@file"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
 
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    environment:
-      DOCKER_CONFIG: /config
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/watchtower/config/:/config/
-    command: --interval 30
-    networks:
-      - reverseproxy-nw
-
 networks:
   reverseproxy-nw:
     external: true
