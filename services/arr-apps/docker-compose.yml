@@ -94,6 +94,7 @@ services:
     environment:
       - TZ=${TZ}
       - NVIDIA_VISIBLE_DEVICES=all
+      - JELLYFIN_PublishedServerUrl=https://jellyfin.sleao.dev
     volumes:
       - ${CONFIG_FOLDER}/jellyfin:/config
       - ${CONFIG_FOLDER}/jellyfin/cache:/cache
@@ -101,6 +102,9 @@ services:
     networks:
       - arr-internal
       - reverseproxy-nw
+    ports:
+      - "8096:8096/tcp"
+      - "8920:8920/tcp"
     restart: unless-stopped
     runtime: nvidia
     labels:
@@ -108,7 +112,10 @@ services:
       - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.sleao.dev`)"
       - "traefik.http.routers.jellyfin.entrypoints=websecure"
       - "traefik.http.routers.jellyfin.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.jellyfin.middlewares=jellyfin-headers@file"
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+      - "traefik.http.services.jellyfin.loadbalancer.passhostheader=true"
+      - "traefik.http.services.jellyfin.loadbalancer.serversTransport=jellyfin-transport@file"
     deploy:
       resources:
         reservations:
@@ -126,7 +133,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${CONFIG_FOLDER}/cleanuparr:/config
-      - ${MEDIA_FOLDER}/torrents:/downloads
+      - ${MEDIA_FOLDER}:/data
     networks:
       - arr-internal
       - reverseproxy-nw
@@ -144,6 +151,25 @@ services:
       timeout: 10s
       start_period: 30s
       retries: 3
+
+  huntarr:
+    container_name: huntarr
+    image: ghcr.io/plexguide/huntarr:latest
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_FOLDER}/huntarr:/config
+    networks:
+      - arr-internal
+      - reverseproxy-nw
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.huntarr.rule=Host(`huntarr.sleao.dev`)"
+      - "traefik.http.routers.huntarr.entrypoints=websecure"
+      - "traefik.http.routers.huntarr.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.huntarr.middlewares=authelia@file"
+      - "traefik.http.services.huntarr.loadbalancer.server.port=9705"
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
