@@ -66,27 +66,6 @@ services:
       - "traefik.http.routers.prowlarr.middlewares=authelia@file"
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
 
-  overseerr:
-    image: lscr.io/linuxserver/overseerr:latest
-    container_name: overseerr
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${CONFIG_FOLDER}/overseerr:/config
-    networks:
-      - reverseproxy-nw
-      - arr-internal
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.overseerr.rule=Host(`overseerr.sleao.dev`)"
-      - "traefik.http.routers.overseerr.entrypoints=websecure"
-      - "traefik.http.routers.overseerr.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.overseerr.middlewares=authelia@file"
-      - "traefik.http.services.overseerr.loadbalancer.server.port=5055"
-
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
@@ -108,21 +87,6 @@ services:
       - "traefik.http.routers.bazarr.tls.certresolver=letsencrypt"
       - "traefik.http.routers.bazarr.middlewares=authelia@file"
       - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
-
-  plex:
-    image: linuxserver/plex
-    container_name: plex
-    restart: unless-stopped
-    network_mode: host
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - VERSION=docker
-      - PLEX_CLAIM=${PLEX_CLAIM}
-    volumes:
-      - ${CONFIG_FOLDER}/plex:/config
-      - ${MEDIA_FOLDER}:/data
 
   jellyfin:
     image: jellyfin/jellyfin
@@ -153,6 +117,26 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+
+  mediamanager:
+    container_name: mediamanager
+    image: ghcr.io/maxdorninger/mediamanager/mediamanager:latest
+    environment:
+      - CONFIG_DIR=/app/config
+    volumes:
+      - ${CONFIG_FOLDER}/mediamanager:/app/config
+      - ${MEDIA_FOLDER}:/data
+    networks:
+      - arr-internal
+      - reverseproxy-nw
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mediamanager.rule=Host(`mediamanager.sleao.dev`)"
+      - "traefik.http.routers.mediamanager.entrypoints=websecure"
+      - "traefik.http.routers.mediamanager.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.mediamanager.middlewares=authelia@file"
+      - "traefik.http.services.mediamanager.loadbalancer.server.port=8000"
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
