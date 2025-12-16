@@ -108,7 +108,6 @@ services:
       - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.sleao.dev`)"
       - "traefik.http.routers.jellyfin.entrypoints=websecure"
       - "traefik.http.routers.jellyfin.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.jellyfin.middlewares=authelia@file"
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
     deploy:
       resources:
@@ -118,25 +117,33 @@ services:
               count: 1
               capabilities: [gpu]
 
-  mediamanager:
-    container_name: mediamanager
-    image: ghcr.io/maxdorninger/mediamanager/mediamanager:latest
+  cleanuparr:
+    container_name: cleanuparr
+    image: ghcr.io/cleanuparr/cleanuparr:latest
     environment:
-      - CONFIG_DIR=/app/config
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - ${CONFIG_FOLDER}/mediamanager:/app/config
-      - ${MEDIA_FOLDER}:/data
+      - ${CONFIG_FOLDER}/cleanuparr:/config
+      - ${MEDIA_FOLDER}/torrents:/downloads
     networks:
       - arr-internal
       - reverseproxy-nw
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mediamanager.rule=Host(`mediamanager.sleao.dev`)"
-      - "traefik.http.routers.mediamanager.entrypoints=websecure"
-      - "traefik.http.routers.mediamanager.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.mediamanager.middlewares=authelia@file"
-      - "traefik.http.services.mediamanager.loadbalancer.server.port=8000"
+      - "traefik.http.routers.cleanuparr.rule=Host(`cleanuparr.sleao.dev`)"
+      - "traefik.http.routers.cleanuparr.entrypoints=websecure"
+      - "traefik.http.routers.cleanuparr.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.cleanuparr.middlewares=authelia@file"
+      - "traefik.http.services.cleanuparr.loadbalancer.server.port=11011"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11011/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
