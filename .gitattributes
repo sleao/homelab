@@ -1,0 +1,9 @@
+# authelia files
+services/authelia/configuration.yml filter=git-crypt diff=git-crypt
+services/authelia/users_database.yml filter=git-crypt diff=git-crypt
+
+# traefik files
+services/traefik/traefik.yml filter=git-crypt diff=git-crypt
+services/traefik/dynamic/middlewares.yml filter=git-crypt diff=git-crypt
+services/traefik/dynamic/tls.yml filter=git-crypt diff=git-crypt
+
