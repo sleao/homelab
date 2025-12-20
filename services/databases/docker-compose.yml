@@ -45,15 +45,10 @@ services:
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     labels:
       - "traefik.enable=true"
-      # HTTP router
-      - "traefik.http.routers.pgadmin-http.rule=Host(`pgadmin.sleao.dev`)"
-      - "traefik.http.routers.pgadmin-http.entrypoints=web"
-      # HTTPS router
       - "traefik.http.routers.pgadmin-https.rule=Host(`pgadmin.sleao.dev`)"
       - "traefik.http.routers.pgadmin-https.entrypoints=websecure"
       - "traefik.http.routers.pgadmin-https.tls.certresolver=letsencrypt"
       - "traefik.http.routers.pgadmin-https.middlewares=authelia@file"
-      # Service
       - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
 
   chartdb:
@@ -65,15 +60,10 @@ services:
       - reverseproxy-nw
     labels:
       - "traefik.enable=true"
-      # HTTP router
-      - "traefik.http.routers.chartdb-http.rule=Host(`chartdb.sleao.dev`)"
-      - "traefik.http.routers.chartdb-http.entrypoints=web"
-      # HTTPS router
       - "traefik.http.routers.chartdb-https.rule=Host(`chartdb.sleao.dev`)"
       - "traefik.http.routers.chartdb-https.entrypoints=websecure"
       - "traefik.http.routers.chartdb-https.tls.certresolver=letsencrypt"
       - "traefik.http.routers.chartdb-https.middlewares=authelia@file"
-      # Service
       - "traefik.http.services.chartdb.loadbalancer.server.port=80"
 
   postgres_exporter:
