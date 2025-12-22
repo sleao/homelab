@@ -1,5 +1,4 @@
 services:
-  
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -24,7 +23,7 @@ services:
       - "traefik.http.routers.prometheus.tls.certresolver=letsencrypt"
       - "traefik.http.routers.prometheus.middlewares=authelia@file"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
-      
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -51,8 +50,6 @@ services:
       - GF_USERS_AUTO_ASSIGN_ORG_ROLE=Admin
       - GF_SERVER_ROOT_URL=https://grafana.sleao.dev
     volumes:
-      - ${CONFIG_FOLDER}/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ${CONFIG_FOLDER}/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ${CONFIG_FOLDER}/grafana/data:/var/lib/grafana
     networks:
       - reverseproxy-nw
@@ -66,7 +63,7 @@ services:
       - "traefik.http.routers.grafana.entrypoints=websecure"
       - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
-      
+
   node_exporter:
     image: prom/node-exporter:latest
     container_name: node_exporter
@@ -82,7 +79,7 @@ services:
       - "--path.rootfs=/host"
       - "--path.sysfs=/sys"
       - "--collector.filesystem.mount-points-exclude=^/(sys|dev|host|etc)($$|/)"
-      
+
 networks:
   reverseproxy-nw:
     external: true
