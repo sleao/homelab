@@ -10,6 +10,7 @@ services:
       KOMODO_DATABASE_ADDRESS: mongo:27017
       KOMODO_DATABASE_USERNAME: ${KOMODO_DB_USERNAME}
       KOMODO_DATABASE_PASSWORD: ${KOMODO_DB_PASSWORD}
+      KOMODO_HOST: "https://komodo.${DOMAIN}"
     volumes:
       - ${CONFIG_PATH}:/backups
     labels:
